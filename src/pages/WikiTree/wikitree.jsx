@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./Newtab.css";
-import "./Newtab.scss";
 import Tree from "react-d3-tree";
+import wikipng from "../../assets/img/wiki-128.png";
 
 const findNodeWithId = (root, searchId) => {
   if (!root || !searchId) {
@@ -87,8 +87,15 @@ const WikiTree = () => {
 
   return (
     <div className="App">
+      <div style={{ padding: "20px", width: "150px", position: "absolute" }}>
+        <img src={wikipng} />
+      </div>
       <div
-        style={{ height: "100vh", width: "100vw", backgroundColor: "#f8f9fa" }}
+        style={{
+          height: "100vh",
+          width: "100vw",
+          backgroundColor: "#f8f9fa",
+        }}
       >
         {tabs && (
           <Tree

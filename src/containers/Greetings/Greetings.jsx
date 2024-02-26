@@ -1,15 +1,11 @@
 import React, { Component } from 'react';
-import icon from '../../assets/img/icon-128.png';
+import icon from '../../assets/img/wiki-128.png';
 
 class GreetingComponent extends Component {
-  state = {
-    name: 'dev',
-  };
-
   render() {
     return (
       <div>
-        <p>Hello, {this.state.name}!</p>
+        <p>Hello, WikiTree!</p>
         <img src={icon} alt="extension icon" />
       </div>
     );
