@@ -32,7 +32,7 @@ const WikiTree = () => {
     children: [],
   });
 
-  const parentDict = JSON.parse(window.localStorage.getItem("tabs"));
+  const parentDict = JSON.parse(window.localStorage.getItem("tabs")) ?? {};
 
   const getWikiTabs = () =>
     chrome.tabs.query(
