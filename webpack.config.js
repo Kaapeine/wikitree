@@ -45,7 +45,7 @@ var options = {
     panel: path.join(__dirname, 'src', 'pages', 'Panel', 'index.jsx'),
   },
   chromeExtensionBoilerplate: {
-    notHotReload: ['background',],
+    notHotReload: ['background'],
   },
   output: {
     filename: '[name].bundle.js',
@@ -184,7 +184,7 @@ var options = {
     }),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'src', 'pages', 'WikiTree', 'index.html'),
-      filename: 'newtab.html',
+      filename: 'wikitree.html',
       chunks: ['wikitree'],
       cache: false,
     }),

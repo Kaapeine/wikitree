@@ -7,6 +7,9 @@
   "action": {
     "title": "HI"
   },
+  "permissions": ["tabs"],
+  "host_permissions": ["http://*/*", "https://*/*"],
+
   "icons": {
     "128": "icon-128.png"
   },
