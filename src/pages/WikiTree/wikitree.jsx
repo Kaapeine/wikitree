@@ -15,48 +15,60 @@ const findNodeWithId = (root, searchId) => {
     const curr = queue.pop();
     // console.log("CURR", curr);
 
-    if (curr?.attributes?.id === searchId) {
+    if (curr.name !== "Wiki" && curr.attributes.id === searchId) {
+      // console.log("FOUND", curr);
       return curr;
     } else {
       curr.children?.map((child) => queue.push(child));
     }
   }
-
   return undefined;
 };
 
 const WikiTree = () => {
-  const [tabs, setTabs] = useState();
+  const [tabs, setTabs] = useState({
+    name: "Wiki",
+    children: [],
+  });
+
+  const parentDict = JSON.parse(window.localStorage.getItem("tabs"));
 
   const getWikiTabs = () =>
     chrome.tabs.query(
       {
-        url: ["*://en.wikipedia.org/wiki/*"],
+        url: ["*://en.wikipedia.org/wiki/*", "<all_urls>"],
       },
       (wikiTabs) => {
         const tree = {
-          name: "root",
+          name: "Wiki",
           children: [],
         };
-        wikiTabs.map((tab) => {
-          console.log(tab);
-          // no parent tab
-          const parentTab = tab.openerTabId
-            ? findNodeWithId(tree, tab.openerTabId)
-            : tree;
+        wikiTabs.length > 0 &&
+          wikiTabs.map((tab) => {
+            // console.log(tab.title, tab.id, tab.openerTabId);
+            // no parent tab
+            let parentId;
+            if (tab.openerTabId) {
+              parentId = tab.openerTabId;
+              parentDict[tab.id] = tab.openerTabId;
+              window.localStorage.setItem("tabs", JSON.stringify(parentDict));
+            } else {
+              parentId = parentDict[tab.id] ?? undefined;
+            }
 
-          const name = tab.title.replace("- Wikipedia", "");
+            const parentTab = parentId ? findNodeWithId(tree, parentId) : tree;
+            const name = tab.title.replace("- Wikipedia", "");
 
-          parentTab.children.push({
-            name: name,
-            attributes: {
-              id: tab.id,
-              parentId: tab.openerTabId,
-              url: tab.url,
-            },
-            children: [],
+            parentTab.children.push({
+              name: name,
+              attributes: {
+                id: tab.id,
+                parentId: parentId,
+                url: tab.url,
+              },
+              children: [],
+            });
           });
-        });
 
         setTabs(tree);
       }
@@ -65,7 +77,36 @@ const WikiTree = () => {
   useEffect(() => {
     getWikiTabs();
   }, []);
-  chrome.tabs.onCreated.addListener(getWikiTabs);
+
+  chrome.tabs.onUpdated.addListener(getWikiTabs);
+
+  // chrome.tabs.onCreated.addListener((tab) => {
+  //   console.log("NEW", tab);
+  //   if (tabs.children.length === 0) return;
+
+  //   const tree = {
+  //     name: "root",
+  //     children: tabs.children,
+  //   };
+
+  //   const parentTab = tab.openerTabId
+  //     ? findNodeWithId(tree, tab.openerTabId)
+  //     : tree;
+
+  //   console.log("PARENT", parentTab);
+
+  //   const name = tab.title.replace("- Wikipedia", "");
+
+  //   parentTab?.children?.push({
+  //     name: name,
+  //     attributes: {
+  //       id: tab.id,
+  //       parentId: tab.openerTabId,
+  //       url: tab.url,
+  //     },
+  //     children: [],
+  //   });
+  // });
 
   console.log("TREE: ", tabs);
 
