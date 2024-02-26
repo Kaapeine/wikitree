@@ -4,8 +4,9 @@ import "./Newtab.scss";
 import Tree from "react-d3-tree";
 
 const findNodeWithId = (root, searchId) => {
-  if (!root) {
-    throw Error("No root tab given");
+  if (!root || !searchId) {
+    console.error("Node or id is undefined");
+    return;
   }
 
   const queue = [root];
@@ -36,7 +37,7 @@ const WikiTree = () => {
   const getWikiTabs = () =>
     chrome.tabs.query(
       {
-        url: ["*://en.wikipedia.org/wiki/*", "<all_urls>"],
+        url: ["*://en.wikipedia.org/wiki/*"],
       },
       (wikiTabs) => {
         const tree = {
@@ -46,7 +47,7 @@ const WikiTree = () => {
         wikiTabs.length > 0 &&
           wikiTabs.map((tab) => {
             // console.log(tab.title, tab.id, tab.openerTabId);
-            // no parent tab
+
             let parentId;
             if (tab.openerTabId) {
               parentId = tab.openerTabId;
@@ -56,7 +57,9 @@ const WikiTree = () => {
               parentId = parentDict[tab.id] ?? undefined;
             }
 
-            const parentTab = parentId ? findNodeWithId(tree, parentId) : tree;
+            let parentTab = findNodeWithId(tree, parentId);
+            if (!parentTab) parentTab = tree;
+
             const name = tab.title.replace("- Wikipedia", "");
 
             parentTab.children.push({
@@ -80,51 +83,25 @@ const WikiTree = () => {
 
   chrome.tabs.onUpdated.addListener(getWikiTabs);
 
-  // chrome.tabs.onCreated.addListener((tab) => {
-  //   console.log("NEW", tab);
-  //   if (tabs.children.length === 0) return;
-
-  //   const tree = {
-  //     name: "root",
-  //     children: tabs.children,
-  //   };
-
-  //   const parentTab = tab.openerTabId
-  //     ? findNodeWithId(tree, tab.openerTabId)
-  //     : tree;
-
-  //   console.log("PARENT", parentTab);
-
-  //   const name = tab.title.replace("- Wikipedia", "");
-
-  //   parentTab?.children?.push({
-  //     name: name,
-  //     attributes: {
-  //       id: tab.id,
-  //       parentId: tab.openerTabId,
-  //       url: tab.url,
-  //     },
-  //     children: [],
-  //   });
-  // });
-
   console.log("TREE: ", tabs);
 
   return (
     <div className="App">
-      <div style={{ height: "100vh", width: "100vw" }}>
+      <div
+        style={{ height: "100vh", width: "100vw", backgroundColor: "#f8f9fa" }}
+      >
         {tabs && (
           <Tree
             data={tabs}
             pathFunc="step"
             orientation="vetical"
-            translate={{ x: window.innerWidth / 2, y: 50 }}
-            separation={{ siblings: 2, nonSiblings: 3 }}
-            onNodeClick={(node) => {
-              chrome.tabs.get(node.data.attributes.id).then((tab) => {
-                chrome.tabs.update(tab.id, { active: true });
-              });
-            }}
+            translate={{ x: window.innerWidth / 2, y: 100 }}
+            separation={{ siblings: 4, nonSiblings: 4 }}
+            nodeSize={{ x: 100, y: 175 }}
+            onNodeClick={(node) => goToTab(node.data)}
+            renderCustomNodeElement={(rd3tNodeProps) =>
+              renderWikiNode({ ...rd3tNodeProps })
+            }
           />
         )}
       </div>
@@ -133,3 +110,37 @@ const WikiTree = () => {
 };
 
 export default WikiTree;
+
+const goToTab = (node) => {
+  if (node.name !== "Wiki") {
+    chrome.tabs.get(node.attributes.id).then((tab) => {
+      chrome.tabs.update(tab.id, { active: true });
+    });
+  }
+};
+
+const renderWikiNode = ({ nodeDatum, foreignObjectProps }) => (
+  <g>
+    {/* <circle r={15}></circle> */}
+    {/* `foreignObject` requires width & height to be explicitly set. */}
+    <foreignObject width={200} height={200} x={-100} y={-50}>
+      <div
+        style={{
+          backgroundColor: "#dedede",
+          borderRadius: "6px",
+          padding: "2px",
+        }}
+        onClick={() => goToTab(nodeDatum)}
+      >
+        <h3 style={{ textAlign: "center", color: "black" }}>
+          {nodeDatum.name}
+        </h3>
+        {/* {nodeDatum.children && (
+          <button style={{ width: "100%" }} onClick={toggleNode}>
+            {nodeDatum.__rd3t.collapsed ? "Expand" : "Collapse"}
+          </button>
+        )} */}
+      </div>
+    </foreignObject>
+  </g>
+);

@@ -2,5 +2,9 @@
   "extends": "react-app",
   "globals": {
     "chrome": "readonly"
+  },
+  "rules": {
+    "react-hooks/exhaustive-deps": "off",
+    "array-callback-return": "off"
   }
 }
