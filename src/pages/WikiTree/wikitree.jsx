@@ -3,6 +3,9 @@ import "./Newtab.css";
 import Tree from "react-d3-tree";
 import wikipng from "../../assets/img/wiki-128.png";
 import save from "../../assets/img/floppy-disk-regular.svg";
+import info from "../../assets/img/info.svg";
+import saveimg from "../../assets/img/saveimg.svg";
+import upload from "../../assets/img/upload.svg";
 
 const findNodeWithId = (root, searchId) => {
   if (!root || !searchId) {
@@ -88,6 +91,15 @@ const WikiTree = () => {
 
   console.log("TREE: ", tabs);
 
+  const importTree = (file) => {
+    let reader = new FileReader();
+    reader.onload = (e) => {
+      let tree = JSON.parse(e.target.result);
+      setTabs(tree);
+    };
+    reader.readAsText(file);
+  };
+
   return (
     <div className="App">
       <div style={{ padding: "20px", width: "150px", position: "absolute" }}>
@@ -122,7 +134,7 @@ const WikiTree = () => {
           right: 0,
         }}
       >
-        <Toolbar />
+        <Toolbar tree={tabs} importTree={importTree} />
       </div>
     </div>
   );
@@ -130,23 +142,97 @@ const WikiTree = () => {
 
 export default WikiTree;
 
-const Toolbar = () => {
+const Toolbar = ({ tree, importTree }) => {
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "right",
-        backgroundColor: "#dedede",
-        borderRadius: "6px",
-        padding: "5px 10px",
-      }}
-    >
-      <div style={{ cursor: "pointer" }} onClick={() => saveImage()}>
-        <img src={save} height={24} width={24} />
+    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#dedede",
+          borderRadius: "6px",
+          padding: "5px 10px",
+        }}
+      >
+        <div style={{ cursor: "pointer" }} onClick={() => exportTree(tree)}>
+          <img src={save} height={24} width={24} alt="save" />
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#dedede",
+          borderRadius: "6px",
+          padding: "5px 10px",
+        }}
+      >
+        <div style={{ cursor: "pointer" }} onClick={() => saveImage()}>
+          <img src={saveimg} height={24} width={24} alt="saveimg" />
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#dedede",
+          borderRadius: "6px",
+          padding: "5px 10px",
+        }}
+      >
+        <div style={{ cursor: "pointer" }}>
+          <label style={{ cursor: "pointer" }}>
+            <img src={upload} height={24} width={24} alt="upload" />
+            <input
+              type="file"
+              id="file"
+              style={{ display: "none" }}
+              name="image"
+              accept="data:text/json"
+              data-original-title="upload json"
+              onInput={(e) => importTree(e.target.files[0])}
+            />
+          </label>
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#dedede",
+          borderRadius: "6px",
+          padding: "5px 10px",
+        }}
+      >
+        <div
+          style={{ cursor: "pointer" }}
+          onClick={() => alert("Made by Vathsa")}
+        >
+          <img src={info} height={24} width={24} alt="info" />
+        </div>
       </div>
     </div>
   );
+};
+
+const exportTree = (obj) => {
+  const dataUrl =
+    "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
+  const link = document.createElement("a");
+  document.body.appendChild(link);
+
+  link.href = dataUrl;
+  link.target = "_self";
+  link.fileName = "test_file_download.gif";
+  link.download = "wikitree";
+  link.click();
 };
 
 const saveImage = async () => {
