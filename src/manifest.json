@@ -7,9 +7,8 @@
   "action": {
     "title": "HI"
   },
-  "permissions": ["tabs"],
-  "host_permissions": ["http://*/*", "https://*/*"],
-
+  "permissions": ["tabs", "activeTab"],
+  "host_permissions": ["http://*/*", "https://*/*", "<all_urls>"],
   "icons": {
     "128": "wiki-128.png"
   },

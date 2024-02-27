@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./Newtab.css";
 import Tree from "react-d3-tree";
 import wikipng from "../../assets/img/wiki-128.png";
+import save from "../../assets/img/floppy-disk-regular.svg";
 
 const findNodeWithId = (root, searchId) => {
   if (!root || !searchId) {
@@ -57,7 +58,9 @@ const WikiTree = () => {
               parentId = parentDict[tab.id] ?? undefined;
             }
 
-            let parentTab = findNodeWithId(tree, parentId);
+            let parentTab = parentId
+              ? findNodeWithId(tree, parentId)
+              : undefined;
             if (!parentTab) parentTab = tree;
 
             const name = tab.title.replace("- Wikipedia", "");
@@ -88,7 +91,7 @@ const WikiTree = () => {
   return (
     <div className="App">
       <div style={{ padding: "20px", width: "150px", position: "absolute" }}>
-        <img src={wikipng} />
+        <img src={wikipng} alt="wikitree" />
       </div>
       <div
         style={{
@@ -112,11 +115,52 @@ const WikiTree = () => {
           />
         )}
       </div>
+      <div
+        style={{
+          padding: "20px",
+          position: "absolute",
+          right: 0,
+        }}
+      >
+        <Toolbar />
+      </div>
     </div>
   );
 };
 
 export default WikiTree;
+
+const Toolbar = () => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "right",
+        backgroundColor: "#dedede",
+        borderRadius: "6px",
+        padding: "5px 10px",
+      }}
+    >
+      <div style={{ cursor: "pointer" }} onClick={() => saveImage()}>
+        <img src={save} height={24} width={24} />
+      </div>
+    </div>
+  );
+};
+
+const saveImage = async () => {
+  chrome.tabs.captureVisibleTab((dataUrl) => {
+    const link = document.createElement("a");
+    document.body.appendChild(link);
+
+    link.href = dataUrl;
+    link.target = "_self";
+    link.fileName = "test_file_download.gif";
+    link.download = "wikitree";
+    link.click();
+  });
+};
 
 const goToTab = (node) => {
   if (node.name !== "Wiki") {
