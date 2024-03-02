@@ -35,6 +35,7 @@ const WikiTree = () => {
     name: "Wiki",
     children: [],
   });
+  const [isSettingsVisibile, setIsSettingsVisible] = useState(false);
 
   const parentDict = JSON.parse(window.localStorage.getItem("tabs")) ?? {};
 
@@ -132,9 +133,28 @@ const WikiTree = () => {
           padding: "20px",
           position: "absolute",
           right: 0,
+          display: "flex",
+          gap: "10px",
+          height: "95vh",
         }}
       >
-        <Toolbar tree={tabs} importTree={importTree} />
+        <Toolbar
+          tree={tabs}
+          importTree={importTree}
+          setIsSettingsVisible={setIsSettingsVisible}
+          isSettingsVisibile={isSettingsVisibile}
+        />
+        <div
+          style={{
+            display: isSettingsVisibile ? "block" : "none",
+            width: "500px",
+            height: "100%",
+            border: "5px solid  #000000",
+            backgroundColor: "#f8f9fa",
+          }}
+        >
+          <Settings />
+        </div>
       </div>
     </div>
   );
@@ -142,49 +162,66 @@ const WikiTree = () => {
 
 export default WikiTree;
 
-const Toolbar = ({ tree, importTree }) => {
+const Settings = () => {
+  return (
+    <div
+      style={{
+        height: "100%",
+        padding: "20px",
+        display: "flex",
+        gap: "30px",
+        flexDirection: "column",
+      }}
+    >
+      <h1>Settings</h1>
+
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        {" "}
+        <h3>URL Prefixes</h3>
+        <textarea style={{ height: "200px", fontSize: "18px" }}></textarea>
+      </div>
+    </div>
+  );
+};
+
+const ToolbarIcon = ({ children }) => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#dedede",
+        borderRadius: "6px",
+        padding: "5px 10px",
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
+const Toolbar = ({
+  tree,
+  importTree,
+  setIsSettingsVisible,
+  isSettingsVisibile,
+}) => {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#dedede",
-          borderRadius: "6px",
-          padding: "5px 10px",
-        }}
-      >
+      <ToolbarIcon>
         <div style={{ cursor: "pointer" }} onClick={() => exportTree(tree)}>
           <img src={save} height={24} width={24} alt="save" />
         </div>
-      </div>
+      </ToolbarIcon>
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#dedede",
-          borderRadius: "6px",
-          padding: "5px 10px",
-        }}
-      >
+      <ToolbarIcon>
         <div style={{ cursor: "pointer" }} onClick={() => saveImage()}>
           <img src={saveimg} height={24} width={24} alt="saveimg" />
         </div>
-      </div>
+      </ToolbarIcon>
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#dedede",
-          borderRadius: "6px",
-          padding: "5px 10px",
-        }}
-      >
+      <ToolbarIcon>
         <div style={{ cursor: "pointer" }}>
           <label style={{ cursor: "pointer" }}>
             <img src={upload} height={24} width={24} alt="upload" />
@@ -199,25 +236,25 @@ const Toolbar = ({ tree, importTree }) => {
             />
           </label>
         </div>
-      </div>
+      </ToolbarIcon>
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#dedede",
-          borderRadius: "6px",
-          padding: "5px 10px",
-        }}
-      >
+      <ToolbarIcon>
         <div
           style={{ cursor: "pointer" }}
           onClick={() => alert("Made by Vathsa")}
         >
           <img src={info} height={24} width={24} alt="info" />
         </div>
-      </div>
+      </ToolbarIcon>
+
+      {/* <ToolbarIcon>
+        <div
+          style={{ cursor: "pointer" }}
+          onClick={() => setIsSettingsVisible(!isSettingsVisibile)}
+        >
+          <img src={info} height={24} width={24} alt="info" />
+        </div>
+      </ToolbarIcon> */}
     </div>
   );
 };
