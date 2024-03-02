@@ -42,7 +42,7 @@ const WikiTree = () => {
   const getWikiTabs = () =>
     chrome.tabs.query(
       {
-        url: ["*://en.wikipedia.org/wiki/*"],
+        url: ["*://en.wikipedia.org/wiki/*", "*://en.m.wikipedia.org/wiki/*"],
       },
       (wikiTabs) => {
         const tree = {
@@ -90,7 +90,7 @@ const WikiTree = () => {
 
   chrome.tabs.onUpdated.addListener(getWikiTabs);
 
-  console.log("TREE: ", tabs);
+  // console.log("TREE: ", tabs);
 
   const importTree = (file) => {
     let reader = new FileReader();
