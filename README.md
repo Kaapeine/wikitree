@@ -13,4 +13,4 @@ Do you love going down rabbit-holes on Wikipedia but forget how you ended up on 
 - Save screenshot
 - Export tree and share with friends, or save it for later
 
-<img src="src/assets/img/hamlet.jpg" />
+<img src="src/assets/img/hamlet.jpeg" />
